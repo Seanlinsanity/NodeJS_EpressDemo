@@ -5,18 +5,18 @@ const app = express()
 
 app.use(express.json()) //Be able to get the body for the post request
 
+//enviroment variable "PORT"
+const port = process.env.PORT || 3000
+app.listen(port, () => {
+    console.log('Listening on port ' + port + '...')
+})
+
 app.get('/', (req, res) => {
     res.send('Helloooo From Sean')
 })
 
 app.get('/api/courses', (req, res) =>{
     res.json(courses)
-})
-
-//enviroment variable "PORT"
-const port = process.env.PORT || 3000
-app.listen(port, () => {
-    console.log('Listening on port ' + port + '...')
 })
 
 const courses = [
@@ -26,7 +26,7 @@ const courses = [
 ]
 
 app.get('/api/course/:id', (req, res) => {
-    const course = courses.find(course => course.id === parseInt(req.params.id))
+    const course = findCoursebyId(req.params.id)
     if (!course) {
         res.status(404).send('Failed to find the course with the given ID')
         return
@@ -36,9 +36,9 @@ app.get('/api/course/:id', (req, res) => {
 
 app.post('/api/create_course', (req, res) => {
 
-    const result = validateName(req.body)
+    const result = validateNameInRequestBody(req.body)
     console.log(result)
-    const { error } = validateName(req.body)  //error = result.error
+    const { error } = validateNameInRequestBody(req.body)  //error = result.error
 
     if (error) return res.status(404).send(error.details[0].message)
 
@@ -51,26 +51,18 @@ app.post('/api/create_course', (req, res) => {
 })
 
 app.put('/api/update_course/:id', (req,res) => {
-    const course = courses.find(course => course.id === parseInt(req.params.id))
+    const course = findCoursebyId(req.params.id)
     if (!course) return res.status(404).send('Failed to update the course with the given ID')
 
-    const result = validateName(req.body)
+    const result = validateNameInRequestBody(req.body)
     if (result.error) return res.status(404).send(result.error.details[0].message)
 
     course.name = req.body.name
     res.send(course)
 })
 
-function validateName(requestBody){
-    const schema = {
-        name: Joi.string().min(3).required()
-    }
-    const result = Joi.validate(requestBody, schema)
-    return result
-}
-
 app.delete('/api/delete_course/:id', (req, res) => {
-    const course = courses.find(course => course.id === parseInt(req.params.id))
+    const course = findCoursebyId(req.params.id)
     if (!course) return res.status(404).send('Failed to Delete the course with the given ID')
 
     const index = courses.indexOf(course)
@@ -79,3 +71,16 @@ app.delete('/api/delete_course/:id', (req, res) => {
     res.send(course)
 
 })
+
+ function validateNameInRequestBody(requestBody){
+    const schema = {
+        name: Joi.string().min(3).required()
+    }
+    const result = Joi.validate(requestBody, schema)
+    return result
+}
+
+function findCoursebyId(id){
+    const course = courses.find(course => course.id === parseInt(id))
+    return course
+}
