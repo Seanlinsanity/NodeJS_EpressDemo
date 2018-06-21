@@ -1,9 +1,21 @@
 const express = require('express') //express is a function
+const morgan = require('morgan')
 const Joi = require('joi')
+const logger = require('./logger')
 
 const app = express()
 
-app.use(express.json()) //Be able to get the body for the post request
+//middleWare function
+app.use(express.json()) //Be able to get the body for the post request: req.body
+app.use(express.urlencoded({ extended: true})) //Be able to read urlencoded format
+app.use(express.static('public')) //Be able to read file in public folder by adding "/filename" to route
+
+//third-party middleWare function
+app.use(morgan('short'))
+
+//custom middleWare function
+app.use(logger)
+
 
 //enviroment variable "PORT"
 const port = process.env.PORT || 3000
