@@ -1,5 +1,6 @@
 const express = require('express') //express is a function
 const morgan = require('morgan')
+// const config = require('config')
 const Joi = require('joi')
 const logger = require('./logger')
 
@@ -15,7 +16,6 @@ app.use(morgan('short'))
 
 //custom middleWare function
 app.use(logger)
-
 
 //enviroment variable "PORT"
 const port = process.env.PORT || 3000
@@ -34,7 +34,7 @@ app.get('/api/courses', (req, res) =>{
 const courses = [
     {id: 1, name: "Node.JS Tutorial"},
     {id: 2, name: "Swift Tutorial"},
-    {id: 3, name: "JavaScript Tutorial"}
+    {id: 3, name: "Java Tutorial"}
 ]
 
 app.get('/api/course/:id', (req, res) => {
